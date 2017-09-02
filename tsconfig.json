@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "amd",
+    "sourceMap": true,
+    "allowJs": true,
+    "outFile": "build.js",
+    "removeComments": true,
+    "watch": true
+  },
+  "compileOnSave": true,
+  "include": [
+    "js/**/*"
+  ]
+}

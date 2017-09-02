@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="">
+		<meta name="author" content="Ben Sergent V">
+		<link rel="icon" href="favicon.ico">
+
+		<title>DEXTER | Health</title>
+
+		<link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Architects+Daughter|Dancing+Script:700" rel="stylesheet">
+		<link href="css/journal.css" rel="stylesheet">
+
+		<script src="js/lib/require.js" data-main="build.js"></script>
+	</head>
+
+	<body>
+
+		<div class="container-fluid">
+			<div class="row">
+				<div style="padding:0px;" class="col-xs-12 col-xs-offset-0 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-4 col-lg-offset-4">
+					<div class="book">
+						<div class="row">
+							<div class="col-xs-12">
+								<div class="header">
+									<h1><span>dexter</span><span>health</span></h1>
+									<div id="version">v0.0.0</div>
+									<div id="author">BFSV</div>
+								</div>
+							</div>
+						</div>
+						<div class="page">
+							<h1 id="date">Thursday, August 31st</h1>
+							<div class="panel" id="fitbit">
+								<div class="row">
+									<div class="col-xs-3">Water</div>
+									<div class="col-xs-3">Food</div>
+									<div class="col-xs-3">Exercise</div>
+									<div class="col-xs-3">Weather</div>
+								</div>
+							</div>
+							<h2>Quality</h2>
+							<div id="quality"><img src="assets/hex_full.png" width="24" /> <img src="assets/hex_full.png" width="24" /> <img src="assets/hex_full.png" width="24" /> <img src="assets/hex_half.png" width="24" /> <img src="assets/hex_empty.png" width="24" /></div>
+							<h2>Notes</h2>
+							<div class="row" id="notes">
+								<div class="col-xs-4"><img src="assets/hex_full.png" width="16" /> Flow</div>
+								<div class="col-xs-4"><img src="assets/hex_empty.png" width="16" /> Worship</div>
+								<div class="col-xs-4"><img src="assets/hex_empty.png" width="16" /> Social</div>
+								<div class="col-xs-4"><img src="assets/hex_empty.png" width="16" /> VR</div>
+								<div class="col-xs-4"><img src="assets/hex_half.png" width="16" /> Work</div>
+								<div class="col-xs-4"><img src="assets/hex_empty.png" width="16" /> Sick</div>
+								<div class="col-xs-4"><img src="assets/hex_empty.png" width="16" /> NyQuil</div>
+								<div class="col-xs-4"><img src="assets/hex_empty.png" width="16" /> Class</div>
+							</div>
+							<h2>Summary</h2>
+							<div contenteditable="true">Worked and programmed</div>
+						</div>
+					</div>
+					<div class="footer">
+						<div id="dexter-box">
+							<canvas id="dexter" width="15" height="15"></canvas>
+						</div>
+						<div id="notif">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</body>
+</html>
