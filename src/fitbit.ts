@@ -28,7 +28,6 @@ export default class FitBit {
         xhr.setRequestHeader('Authorization', 'Bearer ' + token);
       }
     }).then((response) => {
-      console.log(response);
       return response.summary.water;
     });
   }

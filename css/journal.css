@@ -3,6 +3,9 @@ body {
   text-align: center;
   overflow: hidden;
 }
+.container-fluid {
+  overflow-x: hidden;
+}
 h1,h2,h3,h4,h5 {
   margin: 0px;
   font-family: 'Dancing Script', cursive;
@@ -98,20 +101,67 @@ div.page div#quality {
   font-size: 24px;
 }
 
+div.hexcheck {
+  cursor: pointer;
+  user-select: none;
+}
+div.hexcheck > div {
+  display: inline-block;
+  margin-bottom: -4px;
+  width: 16px;
+  height: 16px;
+  background-image: url('../assets/hex_empty.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+div.hexcheck.half > div {
+  background-image: url('../assets/hex_half.png');
+}
+div.hexcheck.full > div {
+  background-image: url('../assets/hex_full.png');
+}
+
 /* Dexter */
+div.footmark {
+  /*position: relative;
+  margin: 5px;
+  margin-right: 0px;
+  padding: 5px;
+  padding-right: 10px;
+  border-radius: 7px;
+  border: 3px dashed #4B4A5B;
+  border-right: none;
+  box-shadow: inset 5px 0px 10px -5px #000;*/
+
+  position: relative;
+  display: inline-block;
+  background-color: #5E080B;
+  margin: 10px -5px 10px 5px;
+  color: #DDD;
+  border-radius: 7px;
+  padding: 10px;
+  padding-right: 30px;
+  box-shadow: 0px 0px 5px #000, inset 5px 0px 10px -5px #000;
+  transform: translate(0px,0px);
+  transition: box-shadow 0.2s, transform 0.2s;
+  background-color: blue;
+  background-image: url('../assets/zwartevilt_@2X.jpg');
+  text-align: center;
+}
+div.footmark:hover {
+  box-shadow: 0px 0px 15px #000, inset 5px 0px 10px -5px #000;
+  transform: translate(-3px,0px);
+}
 div#dexter-box {
   text-align: right;
 }
 canvas#dexter {
-  border-left: 3px solid #522;
-  border-top: 3px solid #522;
-  background-color: black;
+  background-color: transparent; /* #132234 */
   min-width: 75px;
   width: 21%;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   right: 0px;
-  background-color: #000;
   position: relative;
   z-index: 2;
 }
@@ -122,6 +172,7 @@ canvas#dexter {
   left: 0px;
   width: 100%;
   margin-bottom: 0px;
+  text-align: right;
 }
 
 /* NOTIFICATIONS */
