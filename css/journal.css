@@ -27,7 +27,7 @@ h1,h2,h3,h4,h5 {
   font-size: 16px;
 }
 div.header {
-  background-color: tan;
+  background-color: #9F998C;
   color: #333;
   background-image: url('../assets/extra_clean_paper_tan_@2X.png');
   text-align: center;
@@ -90,6 +90,7 @@ div.page div.panel {
   border-radius: 5px;
   margin: 5px 0px;
   padding: 10px;
+  text-align: center;
 }
 
 div.page div#quality {

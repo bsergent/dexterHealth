@@ -2,14 +2,15 @@
   "compilerOptions": {
     "target": "es6",
     "module": "amd",
+    /*outFile": "build.js",*/
+    "outDir": "./dist/",
     "sourceMap": true,
     "allowJs": true,
-    "outFile": "build.js",
     "removeComments": true,
     "watch": true
   },
   "compileOnSave": true,
   "include": [
-    "js/**/*"
+    "src/**/*"
   ]
 }
