@@ -1,7 +1,7 @@
 body {
   background-color: #3B352F;
   text-align: center;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 .container-fluid {
   overflow-x: hidden;
@@ -78,6 +78,7 @@ div.page {
   border-bottom-right-radius: 7px;
   box-shadow: 0px 0px 10px black;
   padding: 10px;
+  padding-bottom: 100px;
   text-align: left;
   min-height: 500px;
 }
@@ -95,6 +96,48 @@ div.page div.panel {
   padding: 10px;
   text-align: center;
 }
+div.page div.panel > div > div {
+  padding: 0px;
+  text-align: center;
+}
+div.page div.panel div.icon  {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  padding: 0px;
+}
+div.page div.panel div.icon > div {
+  position: absolute;
+  bottom: 0px;
+  width: 72px;
+  height: 72px;
+  padding: 0px;
+  background-size: cover;
+  background-position: bottom;
+  background-repeat: no-repeat;
+  transition: height 0.5s;
+}
+div.page div.panel div.icon > div:first-child {
+  height: 0px;
+}
+div.page div.panel div#water div.icon > div:first-child {
+  background-image: url('../assets/water_full.png');
+}
+div.page div.panel div#water div.icon > div:last-child {
+  background-image: url('../assets/water_empty.png');
+}
+div.page div.panel div#food div.icon > div:first-child {
+  background-image: url('../assets/food_full.png');
+}
+div.page div.panel div#food div.icon > div:last-child {
+  background-image: url('../assets/food_empty.png');
+}
+div.page div.panel div#exercise div.icon > div:first-child {
+  background-image: url('../assets/exercise_full.png');
+}
+div.page div.panel div#exercise div.icon > div:last-child {
+  background-image: url('../assets/exercise_empty.png');
+}
 
 div.page div#quality {
   text-align: center;
@@ -104,6 +147,7 @@ div.page div#quality {
 div.hexcheck {
   cursor: pointer;
   user-select: none;
+  font-size: 18px;
 }
 div.hexcheck > div {
   display: inline-block;
@@ -144,7 +188,7 @@ div.footmark {
   box-shadow: 0px 0px 5px #000, inset 5px 0px 10px -5px #000;
   transform: translate(0px,0px);
   transition: box-shadow 0.2s, transform 0.2s;
-  background-color: blue;
+  background-color: #132234;
   background-image: url('../assets/zwartevilt_@2X.jpg');
   text-align: center;
 }
@@ -156,7 +200,7 @@ div#dexter-box {
   text-align: right;
 }
 canvas#dexter {
-  background-color: transparent; /* #132234 */
+  background-color: transparent;
   min-width: 75px;
   width: 21%;
   image-rendering: pixelated;
@@ -167,7 +211,7 @@ canvas#dexter {
 }
 
 .footer {
-  position: absolute;
+  position: fixed;
   bottom: 0px;
   left: 0px;
   width: 100%;

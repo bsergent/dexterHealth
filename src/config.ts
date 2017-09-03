@@ -11,7 +11,8 @@ requirejs.config({
   paths: {
       jquery: '../node_modules/jquery/dist/jquery.min',
       moment: '../node_modules/moment/min/moment.min',
-      bootstrap: '../node_modules/bootstrap/dist/js/bootstrap.min'
+      bootstrap: '../node_modules/bootstrap/dist/js/bootstrap.min',
+      'lodash-es': '../node_modules/lodash/lodash'
   },
   // Wait up to this amount; needed bc loading from URLs
   waitSeconds : 15,

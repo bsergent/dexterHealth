@@ -1,4 +1,13 @@
+import * as _ from 'lodash-es';
 import * as moment from '../node_modules/moment/moment';
+interface Water {
+  current:number,
+  goal:number
+}
+interface Food {
+  current:number,
+  goal:number
+}
 
 export default class FitBit {
   private accessToken:string;
@@ -18,6 +27,8 @@ export default class FitBit {
       console.log('Connected to FitBit');
     }
   }
+
+  // Water
   async getWater(date:moment.Moment) {
     let token = this.accessToken;
     return $.ajax({
@@ -26,6 +37,7 @@ export default class FitBit {
       //data: { content: 'testing test' },
       beforeSend: function(xhr) {
         xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        xhr.setRequestHeader('Accept-Language', 'en_US');
       }
     }).then((response) => {
       return response.summary.water;
@@ -39,9 +51,62 @@ export default class FitBit {
       //data: { content: 'testing test' },
       beforeSend: function(xhr) {
         xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        xhr.setRequestHeader('Accept-Language', 'en_US');
       }
     }).then((response) => {
       return response.goal.goal;
+    });
+  }
+
+  // Food
+  async getFood(date:moment.Moment) {
+    let token = this.accessToken;
+    return $.ajax({
+      url: 'https://api.fitbit.com/1/user/-/foods/log/date/' + date.format('YYYY-MM-DD') + '.json',
+      type: 'GET',
+      //data: { content: 'testing test' },
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        xhr.setRequestHeader('Accept-Language', 'en_US');
+      }
+    }).then((response) => {
+      return response.summary.calories;
+    });
+  }
+  async getFoodGoal() {
+    let token = this.accessToken;
+    return $.ajax({
+      url: 'https://api.fitbit.com/1/user/-/foods/log/goal.json',
+      type: 'GET',
+      //data: { content: 'testing test' },
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        xhr.setRequestHeader('Accept-Language', 'en_US');
+      }
+    }).then((response) => {
+      return response.goals.calories;
+    });
+  }
+
+  // Exercise
+  async getExercise(date:moment.Moment) {
+    let token = this.accessToken;
+    return $.ajax({
+      url: 'https://api.fitbit.com/1/user/-/activities/list.json?afterDate=' + date.format('YYYY-MM-DD') + '&offset=0&limit=20&sort=asc',
+      type: 'GET',
+      //data: { content: 'testing test' },
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        xhr.setRequestHeader('Accept-Language', 'en_US');
+      }
+    }).then((response) => {
+      let groupedActivities = _.groupBy(response.activities, (act:any) => {
+        return moment(act.startTime).format('ddd YYYY-MM-DD');
+      });
+      return {
+        current: Object.keys(groupedActivities).length,
+        goal: 4
+      };
     });
   }
 }

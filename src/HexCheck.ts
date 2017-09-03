@@ -55,6 +55,6 @@ export default class HexCheck {
       attrClass += ' half';
     if (this._state == State.FULL)
       attrClass += ' full';
-    this._element.html('<div class="col-xs-4"><div class="' + attrClass + '"><div></div> ' + this._name + '</div></div>');
+    this._element.html('<div class="col-xs-6 col-sm-4 col-md-3"><div class="' + attrClass + '"><div></div> ' + this._name + '</div></div>');
   }
 }
