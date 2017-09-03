@@ -5,11 +5,12 @@ import FitBit from 'FitBit';
 import HexCheck from 'HexCheck';
 import AnimationSheet from 'lib/AnimationSheet';
 
-$('#date').text(moment().format('dddd, MMM. Do'));
+var selectedDate:moment.Moment = moment().subtract(5, 'hour'); // Start the next day at 5am
+$('#date').text(selectedDate.format('dddd, MMM. Do'));
 
 // FitBit
 var fitbit = new FitBit();
-fitbit.getWater(moment()).then((current) => {
+fitbit.getWater(selectedDate).then((current) => {
   fitbit.getWaterGoal().then((goal) => {
     console.log('Water:' + current.toFixed(0) + '/' + goal.toFixed(0));
     let maxHeight = $('#water .icon').height();
@@ -17,7 +18,7 @@ fitbit.getWater(moment()).then((current) => {
     $water.css('height', Math.min(current / goal * maxHeight, maxHeight).toFixed(0) + 'px');
   });
 });
-fitbit.getFood(moment()).then((current) => {
+fitbit.getFood(selectedDate).then((current) => {
   fitbit.getFoodGoal().then((goal) => {
     console.log('Food:' + current.toFixed(0) + '/' + goal.toFixed(0));
     let maxHeight = $('#food .icon').height();
@@ -25,8 +26,7 @@ fitbit.getFood(moment()).then((current) => {
     $food.css('height', Math.min(current / goal * maxHeight, maxHeight).toFixed(0) + 'px');
   });
 });
-console.log(moment().startOf('isoWeek').format('ddd YYYY-MM-DD'));
-fitbit.getExercise(moment().startOf('isoWeek')).then((response:any) => {
+fitbit.getExercise(selectedDate.startOf('isoWeek')).then((response:any) => {
   console.log('Exercise:' + response.current.toFixed(0) + '/' + response.goal.toFixed(0));
   let maxHeight = $('#exercise .icon').height();
   let $exercise = $('#exercise .icon > div:first-child');
