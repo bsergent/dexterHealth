@@ -14,7 +14,24 @@
 		<link href="https://fonts.googleapis.com/css?family=Architects+Daughter|Dancing+Script:700" rel="stylesheet">
 		<link href="css/journal.css" rel="stylesheet">
 
-		<script src="dist/lib/require.js" data-main="dist/config.js"></script>
+		<!--<script src="dist/lib/require.js" data-main="dist/config.js"></script>-->
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.20.9/system.js"></script>
+		<script src="dist/build.js"></script>
+		<script>
+			SystemJS.config({
+				"paths": {
+          //"moment": "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"
+          "moment": "./node_modules/moment/min/moment.min.js",
+          "jquery": "./node_modules/jquery/dist/jquery.min.js",
+          "firebase": "./node_modules/firebase/firebase.js",
+          "lodash": "./node_modules/lodash/lodash.min.js"
+				}
+      });
+      SystemJS.import("main")
+        .then((module) => {
+        });
+		</script>
 	</head>
 
 	<body>

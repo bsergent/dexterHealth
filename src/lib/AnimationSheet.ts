@@ -1,4 +1,4 @@
-import * as moment from '../../node_modules/moment/moment';
+import moment from 'moment';
 
 interface Box {
   x:number,

@@ -1,5 +1,5 @@
-import * as _ from 'lodash-es';
-import * as moment from '../node_modules/moment/moment';
+import _ from 'lodash';
+import moment from 'moment';
 interface Water {
   current:number,
   goal:number

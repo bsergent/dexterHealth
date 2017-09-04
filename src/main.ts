@@ -1,9 +1,14 @@
-import $ = require('jquery');
-import * as moment from '../node_modules/moment/moment';
-import util = require('util');
-import FitBit from 'FitBit';
-import HexCheck from 'HexCheck';
-import AnimationSheet from 'lib/AnimationSheet';
+import $ from 'jquery';
+import moment from 'moment';
+import util = require('./util');
+import FitBit from './FitBit';
+import HexCheck from './HexCheck';
+import AnimationSheet from './lib/AnimationSheet';
+import firebase from 'firebase';
+
+interface HexCheckDictionary {
+  [label:string]:HexCheck
+}
 
 var selectedDate:moment.Moment = moment().subtract(5, 'hour'); // Start the next day at 5am
 $('#date').text(selectedDate.format('dddd, MMM. Do'));
@@ -35,18 +40,37 @@ fitbit.getExercise(selectedDate.startOf('isoWeek')).then((response:any) => {
 
 
 // Notes
-let notes: string[] = ['flow', 'VR', 'NyQuil', 'worship', 'work', 'class', 'social', 'sick', 'haircut', 'long drive'];
+let notes: string[] = ['flow', 'VR', 'NyQuil', 'worship', 'work', 'class', 'social', 'sick', 'haircut', 'long drive', 'piano', 'guitar'];
 notes.sort((a,b):number => {
   return a.toLowerCase().localeCompare(b.toLowerCase());
 });
 let noteContainer = $('#notes');
-let checks:HexCheck[] = [];
 noteContainer.html('');
+let checks:HexCheckDictionary = {};
 for (let note of notes) {
   let hc = new HexCheck(util.capitalize(note), false);
-  checks.push(hc);
+  checks[note] = hc;
   noteContainer.append(hc.element);
 }
+
+
+// Firebase
+let config = {
+  apiKey: "AIzaSyDaPqsTZiub_fDnPxyslU4d9KS0Rdgd0cA",
+  authDomain: "dexterhealth-81038.firebaseapp.com",
+  databaseURL: "https://dexterhealth-81038.firebaseio.com",
+  projectId: "dexterhealth-81038",
+  storageBucket: "",
+  messagingSenderId: "1027460935212"
+}
+let fire = <firebase.app.App>(firebase as any).firebase.initializeApp(config); // This is all I can get to work...
+// Load notes and update them continuously
+fire.database().ref(selectedDate.format('YYYY-MM-DD')).on('value', function(snapshot:any) {
+  console.log(snapshot);
+  for (let note of snapshot.notes) {
+    checks[note.label].state = note.value;
+  }
+});
 
 
 // Dexter
@@ -62,4 +86,4 @@ setInterval(function() {
 setTimeout(function() {
   dexter.setAnimation('sleep');
   dexter.colorize(50,50,80);
-}, 2000)
+}, 2000);
