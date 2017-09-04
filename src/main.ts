@@ -9,13 +9,21 @@ import firebase from 'firebase';
 interface HexCheckDictionary {
   [label:string]:HexCheck
 }
+interface Entry {
+  quality:number,
+  summary:string,
+  notes:Array<{
+    label:string,
+    value?:any
+  }>
+}
 
 var selectedDate:moment.Moment = moment().subtract(5, 'hour'); // Start the next day at 5am
 $('#date').text(selectedDate.format('dddd, MMM. Do'));
 
 // FitBit
 var fitbit = new FitBit();
-fitbit.getWater(selectedDate).then((current) => {
+fitbit.getWater(selectedDate.clone()).then((current) => {
   fitbit.getWaterGoal().then((goal) => {
     console.log('Water:' + current.toFixed(0) + '/' + goal.toFixed(0));
     let maxHeight = $('#water .icon').height();
@@ -23,7 +31,7 @@ fitbit.getWater(selectedDate).then((current) => {
     $water.css('height', Math.min(current / goal * maxHeight, maxHeight).toFixed(0) + 'px');
   });
 });
-fitbit.getFood(selectedDate).then((current) => {
+fitbit.getFood(selectedDate.clone()).then((current) => {
   fitbit.getFoodGoal().then((goal) => {
     console.log('Food:' + current.toFixed(0) + '/' + goal.toFixed(0));
     let maxHeight = $('#food .icon').height();
@@ -31,7 +39,7 @@ fitbit.getFood(selectedDate).then((current) => {
     $food.css('height', Math.min(current / goal * maxHeight, maxHeight).toFixed(0) + 'px');
   });
 });
-fitbit.getExercise(selectedDate.startOf('isoWeek')).then((response:any) => {
+fitbit.getExercise(selectedDate.clone().startOf('isoWeek')).then((response:any) => {
   console.log('Exercise:' + response.current.toFixed(0) + '/' + response.goal.toFixed(0));
   let maxHeight = $('#exercise .icon').height();
   let $exercise = $('#exercise .icon > div:first-child');
@@ -40,7 +48,7 @@ fitbit.getExercise(selectedDate.startOf('isoWeek')).then((response:any) => {
 
 
 // Notes
-let notes: string[] = ['flow', 'VR', 'NyQuil', 'worship', 'work', 'class', 'social', 'sick', 'haircut', 'long drive', 'piano', 'guitar'];
+let notes: string[] = ['flow', 'vr', 'nyquil', 'worship', 'work', 'class', 'social', 'sick', 'haircut', 'long drive', 'piano', 'guitar'];
 notes.sort((a,b):number => {
   return a.toLowerCase().localeCompare(b.toLowerCase());
 });
@@ -60,16 +68,26 @@ let config = {
   authDomain: "dexterhealth-81038.firebaseapp.com",
   databaseURL: "https://dexterhealth-81038.firebaseio.com",
   projectId: "dexterhealth-81038",
-  storageBucket: "",
   messagingSenderId: "1027460935212"
 }
 let fire = <firebase.app.App>(firebase as any).firebase.initializeApp(config); // This is all I can get to work...
-// Load notes and update them continuously
-fire.database().ref(selectedDate.format('YYYY-MM-DD')).on('value', function(snapshot:any) {
-  console.log(snapshot);
-  for (let note of snapshot.notes) {
-    checks[note.label].state = note.value;
-  }
+// Authentication (bsergentv@gmail.com,electricWater)
+fire.auth().signInWithEmailAndPassword('bsergentv@gmail.com', 'electricWater').then(() => {
+  // Load notes and update them continuously
+  fire.database().ref('/' + selectedDate.format('YYYY-MM-DD')).on('value',
+    function success(snapshot:any) {
+      let entry = snapshot.val() as Entry;
+      $('#summary').text(entry.summary);
+      console.log(entry);
+      for (let note of entry.notes) {
+        if (note.value === undefined) note.value = 2;
+        checks[note.label].state = note.value;
+        // TODO Add support for Notes that aren't tri-state HexChecks
+      }
+    },
+    function failure(error) {
+      console.log(error);
+    });
 });
 
 
