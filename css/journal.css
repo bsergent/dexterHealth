@@ -165,6 +165,12 @@ div.hexcheck.full > div {
   background-image: url('../assets/hex_full.png');
 }
 
+div.page #summary {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+}
+
 /* Dexter */
 div.footmark {
   /*position: relative;
