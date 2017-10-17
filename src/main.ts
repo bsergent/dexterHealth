@@ -21,8 +21,33 @@ interface SimpleNote {
   value?:any
 }
 
-var selectedDate:moment.Moment = moment().subtract(5, 'hour'); // Start the next day at 5am
-$('#date').text(selectedDate.format('dddd, MMM. Do'));
+var selectedDate:moment.Moment = null;
+var currentPageReference:firebase.database.Reference = null;
+function setDate(newDate:moment.Moment) {
+  // Prevent future dates
+  if (newDate > moment().subtract(5, 'hour'))
+    newDate = moment().subtract(5, 'hour');
+  
+  // Change selected page
+  if (selectedDate !== null)
+    fire.database().ref('/' + selectedDate.format('YYYY-MM-DD')).off('value');
+  selectedDate = newDate;
+  if (selectedDate.format('YYYY-MM-DD') === moment().subtract(5, 'hour').format('YYYY-MM-DD'))
+    $('#date').text('Today, ' + selectedDate.format('dddd'));
+  else
+    $('#date').text(selectedDate.format('dddd, MMM. Do'));
+  
+
+  // Update firebase
+  if (currentPageReference !== null) {
+    noteDictionary = [];
+    currentPageReference.off('value');
+    currentPageReference = fire.database().ref('/' + selectedDate.format('YYYY-MM-DD')) as firebase.database.Reference;
+    currentPageReference.on('value', firebasePageUpdate);
+  }
+}
+setDate(moment().subtract(5, 'hour')); // Start the next day at 5am
+
 
 // FitBit
 var fitbit = new FitBit();
@@ -63,55 +88,50 @@ let fire = <firebase.app.App>(firebase as any).firebase.initializeApp(config); /
 // Authentication (bsergentv@gmail.com,electricWater)
 fire.auth().signInWithEmailAndPassword('bsergentv@gmail.com', 'electricWater').then(() => {
   // Load notes and update them continuously
-  fire.database().ref('/' + selectedDate.format('YYYY-MM-DD')).on('value',
-    function success(snapshot:any) {
-      let entry = snapshot.val() as Entry;
-      if (entry === null) {
-        if (selectedDate === moment().subtract(5, 'hour')) {
-          // Only create new entries for the current day
-          initializeEntry();
-          return;
-        } else {
-          // Display blank page for days without entries
-          entry = {
-            summary: 'No data',
-            quality: -1,
-            notes: []
-          }
-        }
-      }
-      let summaryContainer = $('#summary');
-      if (!summaryContainer.is(':focus'))
-        summaryContainer.val(entry.summary);
-      summaryContainer.on('keyup', (event) => { fire.database().ref('/' + selectedDate.format('YYYY-MM-DD') + '/summary').set(summaryContainer.val()); });
-      let changed = false;
-      if (entry.notes === undefined) entry.notes = [];
-      for (let n = 0; n < entry.notes.length; n++) {
-        let note = entry.notes[n];
-        if (note.value === undefined) note.value = true;
-        if (note.type === undefined) note.type = typeof note.value;
-        if (noteDictionary[note.label.toLowerCase()] === undefined) {
-          // Add new entry
-          let newNote = new Note(note.label,
-            note.type,
-            note.value,
-            fire.database().ref('/' + selectedDate.format('YYYY-MM-DD') + '/notes/' + n + '/value')
-          );
-          noteDictionary[note.label.toLowerCase()] = newNote;
-          changed = true;
-        } else {
-          // Update existing entry
-          noteDictionary[note.label.toLowerCase()].value = note.value;
-        }
-      }
-      if (changed) {
-        updateNoteContainer();
-      };
-    },
-    function failure(error) {
-      console.log(error);
-    });
+  currentPageReference = fire.database().ref('/' + selectedDate.format('YYYY-MM-DD')) as firebase.database.Reference;
+  currentPageReference.on('value', firebasePageUpdate)
 });
+
+function firebasePageUpdate(snapshot:any) {
+  let entry = snapshot.val() as Entry;
+  if (entry === null) {
+    if (selectedDate.format('YYYY-MM-DD') === moment().subtract(5, 'hour').format('YYYY-MM-DD')) {
+      // Only create new entries for the current day
+      initializeEntry();
+      return;
+    } else {
+      // Display blank page for days without entries
+      entry = {
+        summary: 'No data',
+        quality: -1,
+        notes: []
+      }
+    }
+  }
+  let summaryContainer = $('#summary');
+  if (!summaryContainer.is(':focus'))
+    summaryContainer.val(entry.summary);
+  summaryContainer.on('keyup', (event) => { fire.database().ref('/' + selectedDate.format('YYYY-MM-DD') + '/summary').set(summaryContainer.val()); });
+  if (entry.notes === undefined) entry.notes = [];
+  for (let n = 0; n < entry.notes.length; n++) {
+    let note = entry.notes[n];
+    if (note.value === undefined) note.value = true;
+    if (note.type === undefined) note.type = typeof note.value;
+    if (noteDictionary[note.label.toLowerCase()] === undefined) {
+      // Add new entry
+      let newNote = new Note(note.label,
+        note.type,
+        note.value,
+        fire.database().ref('/' + selectedDate.format('YYYY-MM-DD') + '/notes/' + n + '/value')
+      );
+      noteDictionary[note.label.toLowerCase()] = newNote;
+    } else {
+      // Update existing entry
+      noteDictionary[note.label.toLowerCase()].value = note.value;
+    }
+  }
+  updateNoteContainer();
+}
 
 function initializeEntry() {
   console.log('Initializing entry...');
@@ -186,11 +206,15 @@ function initializeEntry() {
     return x.label.toLowerCase().localeCompare(y.label.toLowerCase());
   });
   fire.database().ref('/' + selectedDate.format('YYYY-MM-DD')).set({
-    summary: '',
+    summary: 'None',
     quality: -1,
     notes: defaultNotes
   });
 }
+
+// UI
+$('#page-left').click(function () { setDate(selectedDate.clone().subtract(1, 'day')); });
+$('#page-right').click(function () { setDate(selectedDate.clone().add(1, 'day')); });
 
 /*function updateFirebaseNoteOrder():boolean {
   let newNoteArray = [];

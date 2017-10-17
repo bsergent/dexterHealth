@@ -8,6 +8,7 @@ interface SimpleNote {
 
 export default class Note {
   private _element:JQuery<HTMLElement>;
+  private _expanded:boolean = false;
   private _label:string;
   private _type:string;
   private _value:any;
@@ -74,13 +75,13 @@ export default class Note {
         this.value = !this._value;
         break;
       case 'number':
-        // TODO Popup counter
+        // TODO Popup counter (+ and - buttons with number in center)
         break;
       case 'enum':
-        // TODO Popup selector (maybe option to add to enum)
+        // TODO Popup selector (maybe option to add to enum) (title and sub bars w/ scrolling list in center and list as title icon)
         break;
       case 'string':
-        // TODO Popup textfield
+        // TODO Popup textfield (text field in center with pencil icon in top bar)
         break;
     }
   }
