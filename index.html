@@ -21,9 +21,12 @@
 		<script>
 			SystemJS.config({
 				"paths": {
-          //"moment": "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"
-          "moment": "./node_modules/moment/min/moment.min.js",
-          "jquery": "./node_modules/jquery/dist/jquery.min.js",
+					"moment": "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js",
+					"jquery": "http://code.jquery.com/jquery-3.3.1.min.js",
+					//"firebase": "https://www.gstatic.com/firebasejs/4.9.0/firebase.js",
+					//"lodash": "https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.5/lodash.core.min.js",
+          //"moment": "./node_modules/moment/min/moment.min.js",
+          //"jquery": "./node_modules/jquery/dist/jquery.min.js",
           "firebase": "./node_modules/firebase/firebase.js",
           "lodash": "./node_modules/lodash/lodash.min.js"
 				}
@@ -42,11 +45,11 @@
 					<div class="book">
 						<div class="row">
 							<div class="col-xs-12">
-								<div class="header">
+								<!--<div class="header">
 									<h1><span>Liber de</span><span>Tempestivo</span></h1>
-									<div id="version">v0.0.3</div>
+									<div id="version">v0.0.4</div>
 									<div id="author">BFSV</div>
-								</div>
+								</div>-->
 							</div>
 						</div>
 						<div class="page">
@@ -69,11 +72,11 @@
 										<div class="icon"><div></div><div></div></div>
 										<div class="measure"></div>
 									</div>
-									<div class="col-xs-3">Weather</div>
+									<div class="col-xs-3">Weather?<br/>Location?</div>
 								</div>
 							</div>
 							<h2>Quality</h2>
-							<div id="quality"><img src="assets/hex_full.png" width="24" /> <img src="assets/hex_full.png" width="24" /> <img src="assets/hex_full.png" width="24" /> <img src="assets/hex_half.png" width="24" /> <img src="assets/hex_empty.png" width="24" /></div>
+							<div id="quality"></div>
 							<h2>Summary</h2>
 							<textarea id="summary" rows="4"></textarea>
 							<h2>Notes</h2>
@@ -82,11 +85,11 @@
 						</div>
 					</div>
 					<div class="footer">
-						<div class="footmark">
+						<!--<div class="footmark">
 							<div id="dexter-box">
 								<canvas id="dexter" width="15" height="15"></canvas>
 							</div>
-						</div>
+						</div>-->
 						<div id="notif">
 						</div>
 					</div>

@@ -1,5 +1,8 @@
 import _ from 'lodash';
 import moment from 'moment';
+
+// TODO Cache results from previous dates to prevent too many API calls
+
 interface Water {
   current:number,
   goal:number

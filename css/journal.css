@@ -143,13 +143,18 @@ div.page div#quality {
   text-align: center;
   font-size: 24px;
 }
+div.page div#quality div.description {
+  font-size: 16px;
+  text-align: left;
+  margin-top: 8px;
+}
 
 div.hexcheck {
   cursor: pointer;
   user-select: none;
   font-size: 18px;
 }
-div.hexcheck > div {
+div.hexcheck > div:first-child {
   display: inline-block;
   margin-bottom: -4px;
   width: 16px;
@@ -157,6 +162,12 @@ div.hexcheck > div {
   background-image: url('../assets/hex_empty.png');
   background-size: cover;
   background-repeat: no-repeat;
+}
+div.hexcheck > textarea:nth-child(2) {
+  color: rgb(105, 105, 105);
+  margin-left: 24px;
+  background-color: transparent;
+  border: none;
 }
 div.hexcheck.half > div {
   background-image: url('../assets/hex_half.png');
@@ -194,6 +205,10 @@ div.page #summary {
   width: 100%;
   background-color: transparent;
   border: none;
+}
+
+span.disabled {
+  color: #D7D6D7;
 }
 
 /* Dexter */
@@ -253,18 +268,20 @@ canvas#dexter {
 /* NOTIFICATIONS */
 div#notif {
   width: 100%;
-  text-align: center;
+  text-align: left;
   margin: -20px 0px 0px;
-  padding: 0px 10px -5px;
-  padding-right: 21%;
-  background-color: #522;
+  padding: 3px 10px 3px;
   color: #DDD;
+  background-color: #132234;
   position: relative;
   z-index: 1;
-  transform: translateY(30px);
-  transition: transform 0.5s ease;
-  height: 20px;
+  transform: translateX(105%);
+  transition: transform 0.3s ease;
+  bottom: 20px;
+  border-radius: 7px;
+  box-shadow: 0px 0px 5px #000, inset 5px 0px 10px -5px #000;
+  background-image: url('../assets/zwartevilt_@2X.jpg');
 }
 div#notif.visible {
-  transform: translateY(0px);
+  transform: translateX(14px);
 }

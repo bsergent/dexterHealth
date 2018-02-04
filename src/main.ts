@@ -7,23 +7,32 @@ import Note from './Note';
 import AnimationSheet from './lib/AnimationSheet';
 import firebase from 'firebase';
 
+// TODO Add method to import data from Sleep Cycle .csv
+// TODO Make note handling more robust
+// TODO Add quick overview of the last month of quality of life data as a minimal line graph
+// TODO Add method of notes?
+// TODO Add Toggl integration, probably one of their fancy pie charts below notes, and have it auto-populate the notes section
+
 interface HexCheckDictionary {
-  [label:string]:HexCheck
+  [label: string]: HexCheck
 }
 interface Entry {
-  quality:number,
-  summary:string,
-  notes:Array<SimpleNote>
+  quality: number,
+  summary: string,
+  notes: Array<SimpleNote>
 }
 interface SimpleNote {
-  label:string,
-  type?:string,
-  value?:any
+  label: string,
+  type?: string,
+  value?: any
 }
 
-var selectedDate:moment.Moment = null;
-var currentPageReference:firebase.database.Reference = null;
-function setDate(newDate:moment.Moment) {
+// FitBit
+var fitbit = new FitBit();
+
+var selectedDate: moment.Moment = null;
+var currentPageReference: firebase.database.Reference = null;
+function setDate(newDate: moment.Moment) {
   // Prevent future dates
   if (newDate > moment().subtract(5, 'hour'))
     newDate = moment().subtract(5, 'hour');
@@ -36,6 +45,34 @@ function setDate(newDate:moment.Moment) {
     $('#date').text('Today, ' + selectedDate.format('dddd'));
   else
     $('#date').text(selectedDate.format('dddd, MMM. Do'));
+  if (newDate > moment().subtract(5 + 24, 'hour')) $('#page-right').addClass('disabled');
+  else $('#page-right').removeClass('disabled');
+
+  // Update FitBit
+  fitbit.getWater(selectedDate.clone()).then((current) => {
+    fitbit.getWaterGoal().then((goal) => {
+      console.log('Water:' + current.toFixed(0) + '/' + goal.toFixed(0));
+      let maxHeight = $('#water .icon').height();
+      let $water = $('#water .icon > div:first-child');
+      $water.css('height', Math.min(current / goal * maxHeight, maxHeight).toFixed(0) + 'px');
+    });
+  }).catch(ex => { notify('[FitBit] Failed to fetch water.'); });
+
+  fitbit.getFood(selectedDate.clone()).then((current) => {
+    fitbit.getFoodGoal().then((goal) => {
+      console.log('Food:' + current.toFixed(0) + '/' + goal.toFixed(0));
+      let maxHeight = $('#food .icon').height();
+      let $food = $('#food .icon > div:first-child');
+      $food.css('height', Math.min(current / goal * maxHeight, maxHeight).toFixed(0) + 'px');
+    });
+  }).catch(ex => { notify('[FitBit] Failed to fetch food.'); });
+
+  fitbit.getExercise(selectedDate.clone().startOf('isoWeek')).then((response:any) => {
+    console.log('Exercise:' + response.current.toFixed(0) + '/' + response.goal.toFixed(0));
+    let maxHeight = $('#exercise .icon').height();
+    let $exercise = $('#exercise .icon > div:first-child');
+    $exercise.css('height', Math.min(response.current / response.goal * maxHeight, maxHeight).toFixed(0) + 'px');
+  }).catch(ex => { notify('[FitBit] Failed to fetch exercise.'); });
   
 
   // Update firebase
@@ -47,32 +84,6 @@ function setDate(newDate:moment.Moment) {
   }
 }
 setDate(moment().subtract(5, 'hour')); // Start the next day at 5am
-
-
-// FitBit
-var fitbit = new FitBit();
-fitbit.getWater(selectedDate.clone()).then((current) => {
-  fitbit.getWaterGoal().then((goal) => {
-    console.log('Water:' + current.toFixed(0) + '/' + goal.toFixed(0));
-    let maxHeight = $('#water .icon').height();
-    let $water = $('#water .icon > div:first-child');
-    $water.css('height', Math.min(current / goal * maxHeight, maxHeight).toFixed(0) + 'px');
-  });
-});
-fitbit.getFood(selectedDate.clone()).then((current) => {
-  fitbit.getFoodGoal().then((goal) => {
-    console.log('Food:' + current.toFixed(0) + '/' + goal.toFixed(0));
-    let maxHeight = $('#food .icon').height();
-    let $food = $('#food .icon > div:first-child');
-    $food.css('height', Math.min(current / goal * maxHeight, maxHeight).toFixed(0) + 'px');
-  });
-});
-fitbit.getExercise(selectedDate.clone().startOf('isoWeek')).then((response:any) => {
-  console.log('Exercise:' + response.current.toFixed(0) + '/' + response.goal.toFixed(0));
-  let maxHeight = $('#exercise .icon').height();
-  let $exercise = $('#exercise .icon > div:first-child');
-  $exercise.css('height', Math.min(response.current / response.goal * maxHeight, maxHeight).toFixed(0) + 'px');
-});
 
 
 // Firebase
@@ -90,9 +101,9 @@ fire.auth().signInWithEmailAndPassword('bsergentv@gmail.com', 'electricWater').t
   // Load notes and update them continuously
   currentPageReference = fire.database().ref('/' + selectedDate.format('YYYY-MM-DD')) as firebase.database.Reference;
   currentPageReference.on('value', firebasePageUpdate)
-});
+}).catch(ex => { notify('[FireBase] Invalid credentials.'); });
 
-function firebasePageUpdate(snapshot:any) {
+function firebasePageUpdate(snapshot: any): void {
   let entry = snapshot.val() as Entry;
   if (entry === null) {
     if (selectedDate.format('YYYY-MM-DD') === moment().subtract(5, 'hour').format('YYYY-MM-DD')) {
@@ -102,16 +113,18 @@ function firebasePageUpdate(snapshot:any) {
     } else {
       // Display blank page for days without entries
       entry = {
-        summary: 'No data',
+        summary: 'No entry found.',
         quality: -1,
         notes: []
       }
+      // TODO Show an initialize entry button
     }
   }
   let summaryContainer = $('#summary');
   if (!summaryContainer.is(':focus'))
     summaryContainer.val(entry.summary);
-  summaryContainer.on('keyup', (event) => { fire.database().ref('/' + selectedDate.format('YYYY-MM-DD') + '/summary').set(summaryContainer.val()); });
+  summaryContainer.on('keyup', (event) => { fire.database().ref(`/${selectedDate.format('YYYY-MM-DD')}/summary`).set(summaryContainer.val()); });
+  setQuality(entry.quality);
   if (entry.notes === undefined) entry.notes = [];
   for (let n = 0; n < entry.notes.length; n++) {
     let note = entry.notes[n];
@@ -122,7 +135,7 @@ function firebasePageUpdate(snapshot:any) {
       let newNote = new Note(note.label,
         note.type,
         note.value,
-        fire.database().ref('/' + selectedDate.format('YYYY-MM-DD') + '/notes/' + n + '/value')
+        fire.database().ref(`/${selectedDate.format('YYYY-MM-DD')}/notes/${n}/value`)
       );
       noteDictionary[note.label.toLowerCase()] = newNote;
     } else {
@@ -133,7 +146,7 @@ function firebasePageUpdate(snapshot:any) {
   updateNoteContainer();
 }
 
-function initializeEntry() {
+function initializeEntry(): void {
   console.log('Initializing entry...');
   let defaultNotes: SimpleNote[] = [
     {
@@ -200,6 +213,16 @@ function initializeEntry() {
       label: 'Guitar',
       type: 'boolean',
       value: false
+    },
+    {
+      label: 'Bike',
+      type: 'boolean',
+      value: false
+    },
+    {
+      label: 'Gym',
+      type: 'boolean',
+      value: false
     }
   ];
   defaultNotes = defaultNotes.sort((x,y) => {
@@ -212,9 +235,46 @@ function initializeEntry() {
   });
 }
 
+function setQuality(quality: number): void {
+  let html = '<div class="row"><div class="col-xs-7">';
+  for (let i = 1; i <= 5; i++)
+    html += `<img id="quality_${i}" src="assets/hex_${ i <= quality ? 'full' : 'empty' }.png" width="24px" /> `;
+  html += '</div><div class="col-xs-5 description">';
+  switch (quality) {
+    case 1:
+    html += 'Awful';
+      break;
+    case 2:
+    html += 'Stressful'; // Stressful in Sleep Cycle
+      break;
+    case 3:
+    html += 'Okay'; // Nothing in Sleep Cycle
+      break;
+    case 4:
+    html += 'Good'; // Good in Sleep Cycle
+      break;
+    case 5:
+    html += 'Fantastic'; // Great in Sleep Cycle
+      break;
+    default:
+      html += 'Unknown';
+      break;
+  }
+  html += '</div></div>';
+  $('#quality').html(html);
+
+  // Update listeners
+  for (let i = 1; i <= 5; i++) {
+    $('#quality_' + i).click(e => {
+      fire.database().ref(`/${selectedDate.format('YYYY-MM-DD')}/quality`).set(i);
+    });
+  }
+}
+
 // UI
 $('#page-left').click(function () { setDate(selectedDate.clone().subtract(1, 'day')); });
-$('#page-right').click(function () { setDate(selectedDate.clone().add(1, 'day')); });
+$('#date').click(function () { setDate(moment().subtract(5, 'hour')); });
+$('#page-right').click(function () { if (!$('#page-right').hasClass('disabled')) setDate(selectedDate.clone().add(1, 'day')); });
 
 /*function updateFirebaseNoteOrder():boolean {
   let newNoteArray = [];
@@ -241,17 +301,28 @@ $('#page-right').click(function () { setDate(selectedDate.clone().add(1, 'day'))
   return changed;
 }*/
 
-function updateNoteContainer() {
+function updateNoteContainer(): void {
   let container = $('#notes');
   container.html('');
-  // TODO Create the HTML first, then set it, don't append since that shows the raw HTML during creation
-  for (let key of Object.keys(noteDictionary).sort((x,y) => { return x.toLowerCase().localeCompare(y.toLowerCase()); })) {
+  for (let key of Object.keys(noteDictionary)
+      .sort((a, b) => { return a.toLowerCase().localeCompare(b.toLowerCase()); }))
     container.append(noteDictionary[key].element);
-  }
+}
+
+let notificationTimeoutId: number;
+function notify(message: string): void {
+  console.log(message);
+  let notif = $('#notif');
+  notif.text(message);
+  notif.addClass('visible');
+  clearTimeout(notificationTimeoutId);
+  notificationTimeoutId = setTimeout(function () {
+    notif.removeClass('visible');
+  }, 4000);
 }
 
 
-// Dexter
+/*// Dexter
 var canvas = <HTMLCanvasElement> $('#dexter')[0];
 var ctx = canvas.getContext('2d');
 var dexter = new AnimationSheet('assets/emote.png', 'assets/emote.json');
@@ -264,4 +335,4 @@ setInterval(function() {
 setTimeout(function() {
   dexter.setAnimation('sleep');
   dexter.colorize(50,50,80);
-}, 2000);
+}, 2000);*/
