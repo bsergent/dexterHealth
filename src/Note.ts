@@ -101,11 +101,13 @@ export default class Note {
   }
 
   public updateHTML(): void {
-    let html = '';
-    html += '<div class="col-xs-6 col-sm-4 col-md-3">';
+    let html = '<div class="col-xs-6 col-sm-4 col-md-3">';
+    let image = '';
+    if (['Piano','Long drive','Worship'].indexOf(this._label) !== -1)
+      image += `<img src="assets/note_${this._label.toLocaleLowerCase().replace(' ', '_')}.png" width="24px" height="24px"/>`;
     switch (this._type) {
       case 'boolean':
-        html += `<div class="hexcheck ${this._value?'full':''}"><div></div> ${this._label}</div>`;
+        html += `<div class="hexcheck ${this._value?'full':''}"><div></div> ${this._label} ${image}</div>`;
         break;
       case 'number':
         break;
