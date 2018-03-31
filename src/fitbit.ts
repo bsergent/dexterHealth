@@ -14,6 +14,7 @@ interface Food {
 
 export default class FitBit {
   private accessToken:string;
+  private cache = new Map<string,number>();
   constructor() {
     if (!window.location.hash) {
       window.location.replace('https://www.fitbit.com/oauth2/authorize?response_type=token&client_id=228LJG&scope=activity%20nutrition%20heartrate%20location%20nutrition%20profile%20settings%20sleep');
@@ -34,29 +35,38 @@ export default class FitBit {
   // Water
   async getWater(date:moment.Moment) {
     let token = this.accessToken;
+    let dateString = date.format('YYYY-MM-DD');
+    // Always update latest date since it's likely to update
+    if (dateString !== moment().subtract(5, 'hour').format('YYYY-MM-DD') && this.cache.has(`water-${dateString}`))
+      return new Promise<number>((resolve) => { resolve(this.cache.get(`water-${dateString}`)); });
+
+    let request = `https://api.fitbit.com/1/user/-/foods/log/water/date/${dateString}.json`;
     return $.ajax({
-      url: 'https://api.fitbit.com/1/user/-/foods/log/water/date/' + date.format('YYYY-MM-DD') + '.json',
+      url: request,
       type: 'GET',
-      //data: { content: 'testing test' },
       beforeSend: function(xhr) {
         xhr.setRequestHeader('Authorization', 'Bearer ' + token);
         xhr.setRequestHeader('Accept-Language', 'en_US');
       }
     }).then((response) => {
+      this.cache.set(`water-${dateString}`, response.summary.water);
       return response.summary.water;
     });
   }
   async getWaterGoal() {
     let token = this.accessToken;
+    if (this.cache.has('water-goal'))
+      return new Promise<number>((resolve) => { resolve(this.cache.get('water-goal')); });
+
     return $.ajax({
       url: 'https://api.fitbit.com/1/user/-/foods/log/water/goal.json',
       type: 'GET',
-      //data: { content: 'testing test' },
       beforeSend: function(xhr) {
         xhr.setRequestHeader('Authorization', 'Bearer ' + token);
         xhr.setRequestHeader('Accept-Language', 'en_US');
       }
     }).then((response) => {
+      this.cache.set(`water-goal`, response.goal.goal);
       return response.goal.goal;
     });
   }
@@ -64,29 +74,36 @@ export default class FitBit {
   // Food
   async getFood(date:moment.Moment) {
     let token = this.accessToken;
+    let dateString = date.format('YYYY-MM-DD');
+    if (dateString !== moment().subtract(5, 'hour').format('YYYY-MM-DD') && this.cache.has(`food-${dateString}`))
+      return new Promise<number>((resolve) => { resolve(this.cache.get(`food-${dateString}`)); });
+
     return $.ajax({
-      url: 'https://api.fitbit.com/1/user/-/foods/log/date/' + date.format('YYYY-MM-DD') + '.json',
+      url: `https://api.fitbit.com/1/user/-/foods/log/date/${dateString}.json`,
       type: 'GET',
-      //data: { content: 'testing test' },
       beforeSend: function(xhr) {
         xhr.setRequestHeader('Authorization', 'Bearer ' + token);
         xhr.setRequestHeader('Accept-Language', 'en_US');
       }
     }).then((response) => {
+      this.cache.set(`food-${dateString}`, response.summary.calories);
       return response.summary.calories;
     });
   }
   async getFoodGoal() {
     let token = this.accessToken;
+    if (this.cache.has('food-goal'))
+      return new Promise<number>((resolve) => { resolve(this.cache.get('food-goal')); });
+
     return $.ajax({
       url: 'https://api.fitbit.com/1/user/-/foods/log/goal.json',
       type: 'GET',
-      //data: { content: 'testing test' },
       beforeSend: function(xhr) {
         xhr.setRequestHeader('Authorization', 'Bearer ' + token);
         xhr.setRequestHeader('Accept-Language', 'en_US');
       }
     }).then((response) => {
+      this.cache.set(`food-goal`, response.goal.calories);
       return response.goals.calories;
     });
   }
@@ -94,10 +111,10 @@ export default class FitBit {
   // Exercise
   async getExercise(date:moment.Moment) {
     let token = this.accessToken;
+    // TODO Don't requery if already logged activity for today
     return $.ajax({
       url: 'https://api.fitbit.com/1/user/-/activities/list.json?afterDate=' + date.format('YYYY-MM-DD') + '&offset=0&limit=20&sort=asc',
       type: 'GET',
-      //data: { content: 'testing test' },
       beforeSend: function(xhr) {
         xhr.setRequestHeader('Authorization', 'Bearer ' + token);
         xhr.setRequestHeader('Accept-Language', 'en_US');

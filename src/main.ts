@@ -252,7 +252,7 @@ function setDate(newDate: moment.Moment) {
       let $water = $('#water .icon > div:first-child');
       $water.css('height', Math.min(current / goal * maxHeight, maxHeight).toFixed(0) + 'px');
     });
-  }).catch(ex => { notify('[FitBit] Failed to fetch water.'); });
+  }).catch(ex => { notify('[FitBit] Failed to fetch water.'); console.error(ex); });
 
   fitbit.getFood(selectedDate.clone()).then((current) => {
     fitbit.getFoodGoal().then((goal) => {
@@ -269,6 +269,10 @@ function setDate(newDate: moment.Moment) {
     let $exercise = $('#exercise .icon > div:first-child');
     $exercise.css('height', Math.min(response.current / response.goal * maxHeight, maxHeight).toFixed(0) + 'px');
   }).catch(ex => { notify('[FitBit] Failed to fetch exercise.'); });
+
+  // Update weather
+  // TODO Save current weather data to Firebase
+  // Use https://openweathermap.org/ for current data
   
 
   // Update firebase

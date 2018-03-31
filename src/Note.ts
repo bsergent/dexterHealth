@@ -51,7 +51,7 @@ export default class Note {
   public set value(newVal: any) {
     if (newVal === this._value) return;
     this._value = newVal;
-    this._fireRef.set(this._value); // TODO Do all the references get broken after the first change?
+    this._fireRef.set(this._value);
     this.updateHTML();
   }
 
@@ -104,7 +104,7 @@ export default class Note {
     let html = '<div class="col-xs-6 col-sm-4 col-md-3">';
     let image = '';
     if (['Piano','Long drive','Worship'].indexOf(this._label) !== -1)
-      image += `<img src="assets/note_${this._label.toLocaleLowerCase().replace(' ', '_')}.png" width="24px" height="24px"/>`;
+      image += `<img src="assets/note_${this._label.toLocaleLowerCase().replace(' ', '_')}.png" width="23px" height="23px"/>`;
     switch (this._type) {
       case 'boolean':
         html += `<div class="hexcheck ${this._value?'full':''}"><div></div> ${this._label} ${image}</div>`;
