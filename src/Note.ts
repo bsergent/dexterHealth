@@ -1,8 +1,5 @@
 import $ from 'jquery';
 
-// TODO Handle different types of notes other than boolean
-// TODO Add doodles for certain notes like Piano, Class, Long drive, Worship, etc.
-
 interface SimpleNote {
   label: string,
   type?: string,

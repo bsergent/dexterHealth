@@ -235,7 +235,7 @@ function setDate(newDate: moment.Moment) {
   
   // Change selected page
   if (selectedDate !== null)
-    fire.database().ref('/' + selectedDate.format('YYYY-MM-DD')).off('value');
+    fire.database().ref('/' + selectedDate.format('YYYY-MM-DD')).off('value'); // TODO Move entries to subdirectory, then add automation information into another directory
   selectedDate = newDate;
   if (selectedDate.format('YYYY-MM-DD') === moment().subtract(5, 'hour').format('YYYY-MM-DD'))
     $('#date').text('Today, ' + selectedDate.format('dddd'));
@@ -270,10 +270,8 @@ function setDate(newDate: moment.Moment) {
     $exercise.css('height', Math.min(response.current / response.goal * maxHeight, maxHeight).toFixed(0) + 'px');
   }).catch(ex => { notify('[FitBit] Failed to fetch exercise.'); });
 
-  // Update weather
-  // TODO Save current weather data to Firebase
-  // Use https://openweathermap.org/ for current data
-  
+  // Update sleep
+  // Probably more informative than weather, be interesting to see how amount of sleep affects quality of day
 
   // Update firebase
   if (currentPageReference !== null) {
@@ -320,6 +318,7 @@ function updateNoteContainer(): void {
   for (let key of Object.keys(noteDictionary)
       .sort((a, b) => { return a.toLowerCase().localeCompare(b.toLowerCase()); }))
     container.append(noteDictionary[key].element);
+  // TODO Populate two column div's instead so that there's not a space when there's a note taller than usual
 }
 
 let notificationTimeoutId: number;

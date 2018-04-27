@@ -103,7 +103,7 @@ export default class FitBit {
         xhr.setRequestHeader('Accept-Language', 'en_US');
       }
     }).then((response) => {
-      this.cache.set(`food-goal`, response.goal.calories);
+      this.cache.set(`food-goal`, response.goals.calories);
       return response.goals.calories;
     });
   }
@@ -112,8 +112,10 @@ export default class FitBit {
   async getExercise(date:moment.Moment) {
     let token = this.accessToken;
     // TODO Don't requery if already logged activity for today
+    // TODO API doesn't allow before and after dates, so find a work around to only show exercise for the current week
+    //  beforeDate=${date.add(7, 'days').format('YYYY-MM-DD')}
     return $.ajax({
-      url: 'https://api.fitbit.com/1/user/-/activities/list.json?afterDate=' + date.format('YYYY-MM-DD') + '&offset=0&limit=20&sort=asc',
+      url: `https://api.fitbit.com/1/user/-/activities/list.json?afterDate=${date.format('YYYY-MM-DD')}&offset=0&limit=20&sort=asc`,
       type: 'GET',
       beforeSend: function(xhr) {
         xhr.setRequestHeader('Authorization', 'Bearer ' + token);
